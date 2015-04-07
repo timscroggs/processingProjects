@@ -1,0 +1,600 @@
+/*  Tim Scroggs
+ 03/27/2014
+ CSCI 182_002
+ Homework 5 - Game
+ Description:
+ Directions:
+ */
+
+PFont f;
+PImage bg;
+int counter = 0;
+float r = 164; 
+float g = 211; 
+float b = 165;
+float a = 100;
+float xDrive;
+
+float x = width/2 + 250;
+float y = height + 600;
+
+int trafficx1, trafficx2, trafficx3, trafficx4;
+int trafficy1, trafficy2, trafficy3, trafficy4;
+
+int treex1L, treex2L, treex3L;
+int treey1L, treey2L, treey3L;
+
+int treex1R, treex2R, treex3R;
+int treey1R, treey2R, treey3R;
+
+float paintCar1 = 45; 
+float paintCar2 = 240;
+float paintCar3 = 190;
+
+float paintCar1b = 45; 
+float paintCar2b = 240;
+float paintCar3b = 190;
+
+float paintTruck1 = 180; 
+float paintTruck2 = 40;
+float paintTruck3 = 90;
+
+float paintSemiTruck1 = 80; 
+float paintSemiTruck2 = 90;
+float paintSemiTruck3 = 10;
+
+
+boolean forward = false;
+boolean turnR = false;
+boolean turnL = false;
+boolean reverse = false;
+
+int miles = 0; 
+float wrecks = 5.01;
+boolean lost = false;
+float deltax = 1;
+
+
+
+void setup() {
+  size(500, 750);
+  smooth();
+  xDrive = -50;
+
+  f = loadFont("HelveticaNeue-Bold-48.vlw");
+  bg = loadImage("introBackground.jpg");
+  xDrive = -50;
+  trafficy1 = 0;
+  trafficy2 = -300;
+  trafficy3 = -200;
+  trafficy4 = -25;
+  trafficx1 = width/2-85;
+  trafficx2 = width/2+81;
+  trafficx3 = width/2-5;
+  trafficx4 = width/2-280;
+
+  //trees on left side of the road
+  treey1L = 15;
+  treey2L = -55;
+  treey3L = height/2;
+  treex1L = (int) random(40, (width/2-165));
+  treex2L = (int) random(40, (width/2-165));
+  treex3L = (int) random(40, (width/2-165));
+
+  //trees on right side of the road
+  treey1R = 0;
+  treey2R = -55;
+  treey3R = 80;
+  treex1R = (int) random((width/2+165), width-40);
+  treex2R = (int) random((width/2+165), width-40);
+  treex3R = (int) random((width/2+165), width-40);
+}  
+
+
+void draw() {
+  background(r, g, b, a);
+
+  fill(80);
+  stroke(255);
+  strokeWeight(10);
+  stroke(#F0C518);
+  strokeWeight(5);
+  rectMode(CENTER);
+  rect(width/2, height/2, 252, height+10);
+  rectMode(CORNER);
+  noStroke();
+  //strokeWeight(1);
+  //road lines
+  int i;
+  for (i=-1; i< height; i+=25) {
+    fill(255);
+    rect(width/2-42, i, 5, 15);
+    i+=deltax;
+  }
+
+  for (i=-1; i< height; i+=25) {
+    fill(255);
+    rect(width/2+42, i, 5, 15);
+  }
+  
+ 
+  
+  
+  //This is the main car that is being driven home by player
+  carPlayer(x, y);
+
+  trafficCar(trafficx1, trafficy1, paintCar1, paintCar2, paintCar3);
+  trafficTruck(trafficx2, trafficy2, paintTruck1, paintTruck2, paintTruck3);
+  trafficSemiTruck(trafficx3, trafficy3, paintSemiTruck1, paintSemiTruck2, paintSemiTruck3);
+  trafficCar (trafficx4, trafficy4, paintCar1b, paintCar2b, paintCar3b);
+
+  tree(treex1L, treey1L);
+  tree(treex2L, treey2L);
+  tree(treex3L, treey3L);
+
+  tree(treex1R, treey1R);
+  tree(treex2R, treey2R);
+  tree(treex3R, treey3R);
+
+
+  //player driving movements
+  if (forward) y-=3;
+  if (reverse) y+=3;
+  if (turnL) x-=3;
+  if (turnR) x+=3;
+
+  //traffic speed
+  trafficy1 += 2;
+  trafficy2 += 2;
+  trafficy3 += 3;
+  trafficy4 += 2;
+
+
+
+  // this code makes the traffic 
+  if (trafficy1 > height +100) {
+    trafficx1 = width/2-84;
+    trafficy1 = -100;
+    paintCar1 = random(255);
+    paintCar2 = random(255);
+    paintCar3 = random(255);
+  }
+  if (trafficy2 > height +100) {
+    trafficx2 = width/2+81;
+    trafficy2 = -200;
+    paintTruck1 = random(255);
+    paintTruck2 = random(255);
+    paintTruck3 = random(255);
+  }
+  if (trafficy3 > height +100) {
+    trafficx3 = width/2-5;
+    trafficy3 = -400;
+    paintSemiTruck1 = random(255);
+    paintSemiTruck2 = random(255);
+    paintSemiTruck3 = random(255);
+  }
+  if (trafficy4 > height +100) {
+    trafficx4 = width/2+86;
+    trafficy4 = -220;
+    paintCar1b = random(255);
+    paintCar2b = random(255);
+    paintCar3b = random(255);
+  }
+
+  //trees passing by
+  treey1L += 1;
+  treey2L += 1;
+  treey3L += 1;
+
+  treey1R += 1;
+  treey2R += 1;
+  treey3R += 1;
+
+  if (treey1L > height +100) {
+    treex1L = (int) random(40, (width/2-165));
+    treey1L = (int) random(-400, -50);
+  }
+  if (treey2L > height +100) {
+    treex2L = (int) random(40, (width/2-165));
+    treey2L = (int) random(-400, -70);
+  }
+  if (treey3L > height +100) {
+    treex3L = (int) random(40, (width/2-165));
+    treey3L = (int) random(-400, -100);
+  }
+
+  //trees on the right side of the road
+
+  if (treey1R > height +100) {
+    treex1R = (int) random((width/2+165), width);
+    treey1R = (int) random(-400, -50);
+  }
+  if (treey2R > height +100) {
+    treex2R = (int) random((width/2+165), width);
+    treey2R = (int) random(-400, -80);
+  }
+  if (treey3R > height +100) {
+    treex3R = (int) random((width/2+165), width);
+    treey3R = (int) random(-400, -60);
+  }
+
+
+  if (frameCount > 360 && frameCount<= 720) {
+    miles = 1;
+  }
+  else if (frameCount > 720 && frameCount<= 1080) {
+    miles = 2;
+    frameRate(70);
+  }
+  else if (frameCount > 1080 && frameCount<= 1440) { 
+    miles = 3;
+    frameRate(80);
+  }
+  else if (frameCount > 1440 && frameCount<= 1800) {
+    miles = 4;
+    frameRate(90);
+  }
+  else if (frameCount > 1800 && frameCount<= 2160) {
+    miles = 5;
+    frameRate(100);
+  }
+  else if (frameCount > 2160 && frameCount<= 2520) {
+    miles = 6;
+    frameRate(110);
+  }
+  else if (frameCount > 2520 && frameCount<= 2880) {
+    miles = 7;
+    frameRate(120);
+  }
+  else if (frameCount > 2880 && frameCount<= 3240) {
+    miles = 8;
+    frameRate(130);
+  }
+  else if (frameCount > 3240 && frameCount<= 3600) {
+    miles = 9;
+    frameRate(140);
+  }
+  else if (frameCount > 3600) {
+    miles = 10;
+    frameRate(150);
+  }
+
+
+  fill(255, 0, 0);
+  textFont(f, 13);
+  text("Miles traveled = "+miles, 8, 25); 
+  text("Wrecks = "+(int)wrecks, 410, 25);  //Print the score on the screen
+
+
+  if (x < width/2-101 || x > width/2 + 101) {
+    wrecks= wrecks-0.01;
+    fill(255);
+    textFont(f, 24);
+    text("Watch the road!!", width/2 - 95, height/2 - 180);
+    fill(255, 0, 0);
+    textFont(f, 24);
+    text("YOU'RE WRECKING!", width/2 - 115, height/2 - 145);
+
+    // this is nice little health bar so player can visualize their death!
+
+    noFill();
+    strokeWeight(4);
+    stroke(255, 0, 0);
+    rect(width/2-75, height/2-115, 165, 45);
+    fill(255, 0, 0);
+    rect(width/2-75, height/2-115, wrecks*30, 45);
+  }
+
+  if (y >height + 55 || y < 0 + 50) {
+    wrecks= wrecks-0.01;
+    fill(255);
+    textFont(f, 24);
+    text("Watch the road!!", width/2 - 95, height/2 - 180);
+    fill(255, 0, 0);
+    textFont(f, 24);
+    text("YOU'RE WRECKING!", width/2 - 115, height/2 - 145);
+
+    // this is nice little health bar so player can visualize their death!
+
+    noFill();
+    strokeWeight(4);
+    stroke(255, 0, 0);
+    rect(width/2-75, height/2-115, 165, 45);
+    fill(255, 0, 0);
+    rect(width/2-75, height/2-115, wrecks*30, 45);
+  }
+  //This code determines when the players car wrecks into the small car in the traffic
+
+  if (x - trafficx1 > -50 && x - trafficx1 < 50 &&
+    y - trafficy1 > -112 && y - trafficy1 < 112) {
+    wrecks= wrecks-0.01;
+    fill(255);
+    textFont(f, 24);
+    text("Watch the road!!", width/2 - 95, height/2 - 180);
+    fill(255, 0, 0);
+    textFont(f, 24);
+    text("YOU'RE WRECKING!", width/2 - 115, height/2 - 145);
+
+    // this is nice little health bar so player can visualize their death!
+
+    noFill();
+    strokeWeight(4);
+    stroke(255, 0, 0);
+    rect(width/2-75, height/2-115, 165, 45);
+    fill(255, 0, 0);
+    rect(width/2-75, height/2-115, wrecks*30, 45);
+  }
+
+  //This code determines when the players car wrecks into the pickup truck in the traffic
+
+  if (x - trafficx2 > -50 && x - trafficx2 < 50 &&
+    y - trafficy2 > -134.5 && y - trafficy2 < 134.5) {
+    wrecks= wrecks-0.01;
+    fill(255);
+    textFont(f, 24);
+    text("Watch the road!!", width/2 - 95, height/2 - 180);
+    fill(255, 0, 0);
+    textFont(f, 24);
+    text("YOU'RE WRECKING!", width/2 - 115, height/2 - 145);
+
+
+    // this is nice little health bar so player can visualize their death!
+    noFill();
+    strokeWeight(4);
+    stroke(255, 0, 0);
+    rect(width/2-75, height/2-115, 165, 45);
+    fill(255, 0, 0);
+    rect(width/2-75, height/2-115, wrecks*30, 45);
+  }
+
+  //This code determines when the players car wrecks into the semitruck in the traffic
+
+  if (x - trafficx3 > -54.5 && x - trafficx3 < 54.5 &&
+    y - trafficy3 > -194 && y - trafficy3 < 194) {
+    wrecks= wrecks-0.01;
+    fill(255);
+    textFont(f, 24);
+    text("Watch the road!!", width/2 - 95, height/2 - 180);
+    fill(255, 0, 0);
+    textFont(f, 24);
+    text("YOU'RE WRECKING!", width/2 - 115, height/2 - 145);
+
+    // this is nice little health bar so player can visualize their death!
+
+    noFill();
+    strokeWeight(4);
+    stroke(255, 0, 0);
+    rect(width/2-75, height/2-115, 165, 45);
+    fill(255, 0, 0);
+    rect(width/2-75, height/2-115, wrecks*30, 45);
+  }
+
+  //This code determines when the players car wrecks into the second small car in the traffic
+
+  if (x - trafficx4 > -50 && x - trafficx4 < 50 &&
+    y - trafficy4 > -112 && y - trafficy4 < 112) {
+    wrecks= wrecks-0.01;
+    fill(255);
+    textFont(f, 24);
+    text("Watch the road!!", width/2 - 95, height/2 - 180);
+    fill(255, 0, 0);
+    textFont(f, 24);
+    text("YOU'RE WRECKING!", width/2 - 115, height/2 - 145);
+
+    // this is nice little health bar so player can visualize their death!
+    noFill();
+    strokeWeight(4);
+    stroke(255, 0, 0);
+    rect(width/2-75, height/2-115, 165, 45);
+    fill(255, 0, 0);
+    rect(width/2-75, height/2-115, wrecks*30, 45);
+  }
+
+
+
+
+  if (wrecks<=0) {                                 //Check to see if you lost
+    textFont(f, 48);
+    fill(255,0,0);
+    text("Click to Restart", width/2 - 180, height/2+80);
+    text("GAME OVER", width/2 - 145, height/2);
+    lost=true;
+    noLoop();
+  }
+  if (miles == 10) {
+    background(bg);
+    fill(255);
+    textFont(f, 48);
+    text("YOU MADE IT", width/2 - 160, height/2-25);
+    text("HOME!", width/2 - 80, height/2 + 25);
+    lost=true;
+    noLoop();
+    //Stop looping at the end of the draw function
+  }
+
+  //counter++;
+  //fill(a);
+  //rect(0,0,width, height);
+  //if (counter > 4000) {
+  //a-= 0.15;
+  //}
+}
+
+
+
+//------------------------END OF DRAW FUNCTION-----------------------//
+void mousePressed() {
+  if (lost==true) { // game is already over
+    wrecks = 5;
+    miles = 0;
+    x = width/2;
+    y = height/2+200;
+    lost = false;
+    loop();
+  }
+}
+
+
+//----------------------------------------------------------------------//
+//                     Functions for Player/Driver                      //
+//----------------------------------------------------------------------//
+
+void carPlayer (float x, float y) {
+  noStroke();
+  fill(255, 166, 222);
+  rect(x-25, y-67, 50, 134);//car body
+  fill(0);
+  stroke(255, 166, 222);
+  strokeWeight(2);
+  rect(x-24, y-22, 47, 47);//windows
+  noStroke();
+  fill(255);
+  rect(x-18, y-15, 36, 34);//roof top
+  stroke(255); 
+  strokeWeight(3);
+  strokeCap(ROUND);
+  line(x-23, y-21, x-18, y-15);
+  line(x-23, y+8, x-16, y+8);
+  line(x-24, y+24, x-18, y+18);
+  line(x+17, y-15, x+22, y-21);
+  line(x+23, y+8, x-16, y+8);
+  line(x+17, y+19, x+22, y+24);
+}
+
+void keyPressed() {
+  if (key == CODED) {
+    if (keyCode == UP) forward = true; 
+    if (keyCode == DOWN) reverse = true; 
+    if (keyCode == LEFT) turnL = true; 
+    if (keyCode == RIGHT) turnR = true;
+  }
+}
+
+void keyReleased() {
+  if (key == CODED) {
+    if (keyCode == UP) forward = false; 
+    if (keyCode == DOWN) reverse = false; 
+    if (keyCode == LEFT) turnL = false; 
+    if (keyCode == RIGHT) turnR = false;
+  }
+}
+
+//----------------------------------------------------------------------//
+//           Functions for Traffic Vehicles & Shrubbery                 //
+//----------------------------------------------------------------------//
+
+void trafficSemiTruck (float x, float y, float r, float g, float b) {
+  noStroke();
+  fill(r, g, b);
+  rect(x-28, y-127, 55, 92);//car body
+  fill(0);
+  stroke(r, g, b);
+  strokeWeight(2);
+  rect(x-24, y-89, 47, 41);//windows
+  noStroke();
+  fill(r-70, g-70, b-70); 
+  rect(x-25, y-62, 50, 30);
+  fill(r-100, g-120, b-120);
+
+  rect(x-30, y-59, 59, 185);//trailer of truck
+  noStroke();
+  fill(r, g, b);
+  rect(x-18, y-82, 36, 20);//roof top
+  stroke(r, g, b);
+  strokeWeight(3);
+  strokeCap(ROUND);
+  line(x-23, y-88, x-18, y-82);
+  line(x-23, y-64, x-16, y-64);
+  //line(x-24, y+24, x-18, y+18);
+  line(x+17, y-82, x+22, y-88);
+  line(x+23, y-64, x-16, y-64);
+  //line(x+17, y+19, x+22, y+24);
+}
+
+void trafficCar (float x, float y, float r, float g, float b) {
+  noStroke();
+  fill(r, g, b);
+  rect(x-25, y-47, 50, 90);//car body
+  fill(0);
+  stroke(r, g, b);
+  strokeWeight(2);
+  rect(x-24, y-22, 47, 47);//windows
+  noStroke();
+  fill(r, g, b);
+  rect(x-18, y-15, 36, 34);//roof top
+  stroke(r, g, b);
+  strokeWeight(3);
+  strokeCap(ROUND);
+  line(x-23, y-21, x-18, y-15);
+  line(x-23, y+3, x-16, y+3);
+  line(x-24, y+24, x-18, y+18);
+  line(x+17, y-15, x+22, y-21);
+  line(x+23, y+3, x-16, y+3);
+  line(x+17, y+19, x+22, y+24);
+}
+
+void trafficTruck (float x, float y, float r, float g, float b) {
+  noStroke();
+  fill(r, g, b);
+  rect(x-25, y-57, 50, 135);//car body
+  fill(0);
+  stroke(r, g, b);
+  strokeWeight(2);
+  rect(x-24, y-22, 47, 28);//windows 
+  fill(r-80, b-80, g-80);
+  noStroke();
+  rect(x-22, y+6, 44, 69);//bed of truck
+  noStroke();
+  fill(r, g, b);
+  rect(x-18, y-15, 36, 20);//roof top
+  stroke(r, g, b);
+  strokeWeight(3);
+  strokeCap(ROUND);
+  line(x-23, y-21, x-18, y-15);
+  line(x-23, y+3, x-16, y+3);
+  //line(x-24, y+24, x-18, y+18);
+  line(x+17, y-15, x+22, y-21);
+  line(x+23, y+3, x-16, y+3);
+  //line(x+17, y+19, x+22, y+24);
+}
+
+
+void tree (float treeX, float treeY) {
+  noStroke();
+  fill(#0D900E);
+  ellipse(treeX, treeY, 50, 50);
+  ellipse(treeX - 15, treeY - 10, 45, 30);
+  ellipse(treeX + 15, treeY - 10, 55, 40);
+  ellipse(treeX + 20, treeY + 20, 55, 60);
+  ellipse(treeX - 15, treeY + 20, 75, 60);
+  ellipse(treeX - 10, treeY + 20, 50, 80);
+}
+
+
+//----------------------------------------------------------------------//
+//                    Functions for GAME OVER Screen                    //
+//----------------------------------------------------------------------//
+
+void winScreen() {
+  background(bg);
+
+  textFont(f, 22);
+  text("Trying to Get Home", width/2 - 150, height/2 - 125);
+  text("Use the arrow keys to navigate through the traffic", width/2 - 150, height/2 - 95);
+  textFont(f, 48);
+  text("GAME OVER", width/2 - 150, height/2);
+  //if (score > 0)
+  //text("GAME OVER", width/2 - 150, height/2);
+  //else
+  //text("FAILURE", width/2 - 150, height/2);
+  //text("Score: " + score, width/2 - 150, height/2 + 60);
+  fill(125);
+  textFont(f, 26);
+  text("Press any key to restart.", width/2 - 150, height/2 + 40);
+  noLoop();
+}
+
+
+
+
+
